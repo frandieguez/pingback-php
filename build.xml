@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="OpenNemas" default="build">
+
+    <target name="build-sequential"
+            depends="prepare,lint,phploc-ci,pdepend,phpmd-ci,phpcs-ci,phpcpd,phpunit-ci,docblox" />
+
+    <path id="project.paths.php">
+        <pathelement path="${basedir}/src/Pingback" />
+        <!-- Take a look at lint target should be updated -->
+    </path>
+    <pathconvert pathsep=" " property="project.paths.php.space-separated" refid="project.paths.php"/>
+    <pathconvert pathsep="," property="project.paths.php.comma-separated" refid="project.paths.php"/>
+
+    <target name="build" depends="prepare,lint,tools-parallel"/>
+
+    <target name="tools-parallel" description="Run tools in parallel">
+        <parallel threadCount="4">
+            <sequential>
+                <antcall target="pdepend"/>
+                <antcall target="phpmd-ci"/>
+            </sequential>
+            <antcall target="phploc-ci"/>
+            <antcall target="phpcs-ci"/>
+            <antcall target="phpcpd"/>
+            <antcall target="phpunit-ci"/>
+            <antcall target="docblox"/>
+        </parallel>
+    </target>
+
+    <target name="clean" description="Cleanup build artifacts">
+        <delete dir="${basedir}/build/api"/>
+        <delete dir="${basedir}/build/coverage"/>
+        <delete dir="${basedir}/build/code-browser"/>
+        <delete dir="${basedir}/build/logs"/>
+        <delete dir="${basedir}/build/pdepend"/>
+    </target>
+
+    <!-- <target name="prepare" depends="clean,phpab" -->
+    <target name="prepare" depends="clean" description="Prepare for build">
+        <mkdir dir="${basedir}/build/api"/>
+        <mkdir dir="${basedir}/build/code-browser"/>
+        <mkdir dir="${basedir}/build/coverage"/>
+        <mkdir dir="${basedir}/build/logs"/>
+        <mkdir dir="${basedir}/build/pdepend"/>
+    </target>
+
+    <target name="lint">
+        <apply executable="php" failonerror="true">
+            <arg value="-l" />
+            <fileset dir=".">
+                <include name="src/Pingback/" />
+            </fileset>
+        </apply>
+    </target>
+
+    <target name="phploc" description="Measure project size using PHPLOC">
+        <exec executable="phploc" failonerror="true">
+            <arg line="${project.paths.php.space-separated}" />
+        </exec>
+    </target>
+
+    <target name="phploc-ci" description="Measure project size using PHPLOC">
+        <exec executable="phploc" failonerror="true">
+            <arg value="--log-csv" />
+            <arg path="${basedir}/build/logs/phploc.csv" />
+            <arg line="${project.paths.php.space-separated}" />
+        </exec>
+    </target>
+
+    <target name="pdepend" description="Calculate software metrics using PHP_Depend">
+        <exec executable="pdepend">
+            <arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml" />
+            <arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg" />
+            <arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg" />
+            <arg value="${project.paths.php.comma-separated}" />
+        </exec>
+    </target>
+
+    <target name="phpmd"
+        description="Perform project mess detection using PHPMD">
+        <exec executable="phpmd">
+            <arg line="${project.paths.php.comma-separated}" />
+            <arg value="text" />
+            <arg value="${basedir}/build/phpmd.xml" />
+        </exec>
+    </target>
+
+    <target name="phpmd-ci" description="Perform project mess detection using PHPMD">
+        <exec executable="phpmd">
+            <arg line="${project.paths.php.comma-separated}" />
+            <arg value="xml" />
+            <arg value="${basedir}/build/phpmd.xml" />
+            <arg value="--reportfile" />
+            <arg value="${basedir}/build/logs/pmd.xml" />
+        </exec>
+    </target>
+
+    <target name="phpcs"
+        description="Find coding standard violations using PHP_CodeSniffer">
+        <exec executable="phpcs">
+            <arg line="-n" />
+            <arg value="--standard=PSR2" />
+            <arg line="${project.paths.php.space-separated}" />
+        </exec>
+    </target>
+
+    <target name="phpcs-ci"
+        description="Find coding standard violations using PHP_CodeSniffer">
+        <exec executable="phpcs" output="${basedir}/build/logs/checkstyle.xml">
+            <arg line="-n" />
+            <arg line="--report=checkstyle" />
+            <arg value="--standard=PSR2" />
+            <arg line="${project.paths.php.space-separated}" />
+        </exec>
+    </target>
+
+    <target name="phpcpd" description="Find duplicate code using PHPCPD">
+        <exec executable="phpcpd">
+            <arg line="--log-pmd" />
+            <arg value="${basedir}/build/logs/pmd-cpd.xml" />
+            <arg line="${project.paths.php.space-separated}" />
+        </exec>
+    </target>
+
+    <target name="docblox">
+        <exec executable="docblox">
+            <arg line="-d" />
+            <arg value="${project.paths.php.comma-separated}" />
+            <arg line="-t" />
+            <arg path="${basedir}/build/api" />
+        </exec>
+    </target>
+
+    <target name="phpunit" description="Run unit tests with PHPUnit">
+        <exec executable="phpunit" failonerror="true">
+            <arg line="-c" />
+            <arg value="${basedir}/app/phpunit.xml.dist" />
+        </exec>
+    </target>
+
+    <target name="phpunit-ci" description="Run unit tests with PHPUnit">
+        <exec executable="phpunit" failonerror="true">
+            <arg line="-c" />
+            <arg value="${basedir}/phpunit.xml.dist" />
+            <arg line="--coverage-html" />
+            <arg value="${basedir}/build/coverage" />
+            <arg line="--coverage-clover" />
+            <arg value="${basedir}/build/logs/clover.xml" />
+            <arg line="--log-junit" />
+            <arg value="${basedir}/build/logs/junit.xml" />
+        </exec>
+    </target>
+</project>
