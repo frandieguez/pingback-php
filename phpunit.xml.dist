@@ -19,7 +19,7 @@
 
     <testsuites>
         <testsuite name="Pingback Test Suite">
-            <directory>./tests/Pingback/</directory>
+            <directory>./src/Pingback/</directory>
         </testsuite>
     </testsuites>
 
@@ -31,7 +31,7 @@
 
     <filter>
         <whitelist>
-            <directory>./tests/Pingback/</directory>
+            <directory>./src/Pingback/Tests/*</directory>
             <!-- <exclude>
                 <directory>./tests/Pingback/Bridge/*/Tests</directory>
             </exclude> -->

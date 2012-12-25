@@ -90,7 +90,10 @@ class Client
      **/
     public function discoverXmlRPCServer($sourceUrl)
     {
-        list($headers, $document) = $this->handler->get($sourceUrl);
+        $response = $this->handler->get($sourceUrl);
+
+        $headers = $response['headers'];
+        $content = $response['content'];
 
         // Detect XML-RPC server from the document headers
         foreach ($headers as $header) {
@@ -102,7 +105,7 @@ class Client
         }
 
         // Detect server from the document content
-        preg_match('@<link rel="pingback" href="([^>]*)" /?>@i', $document, $matches);
+        preg_match('@<link rel="pingback" href="([^>]*)" /?>@i', $content, $matches);
         if (!array_key_exists(1, $matches)) {
             throw new Exception\NotAvailableXmlRPCServer(
                 'Unable to find the target XMLRPC server'
@@ -140,27 +143,27 @@ class Client
      *
      * @return Context
      **/
-    private function prepareRequestComponents($sourceUrl, $targetUrl)
+    public function prepareRequestComponents($sourceUrl, $targetUrl)
     {
         $parse = parse_url($targetUrl);
         $targetBaseDomain = $parse['host'];
 
-        $content = '<?xml version="1.0" encoding="iso-8859-1"?>
-<methodCall>
-<methodName>pingback.ping</methodName>
-<params>
- <param>
-  <value>
-   <string>'.$sourceUrl.'</string>
-  </value>
- </param>
- <param>
-  <value>
-   <string>'.$targetUrl.'</string>
-  </value>
- </param>
-</params>
-</methodCall>';
+        $content = '<?xml version="1.0" encoding="iso-8859-1"?>'.PHP_EOL
+            .'<methodCall>'.PHP_EOL
+            .'<methodName>pingback.ping</methodName>'.PHP_EOL
+            .'<params>'.PHP_EOL
+            .' <param>'.PHP_EOL
+            .'  <value>'.PHP_EOL
+            .'   <string>'.$sourceUrl.'</string>'.PHP_EOL
+            .'  </value>'.PHP_EOL
+            .' </param>'.PHP_EOL
+            .' <param>'.PHP_EOL
+            .'  <value>'.PHP_EOL
+            .'   <string>'.$targetUrl.'</string>'.PHP_EOL
+            .'  </value>'.PHP_EOL
+            .' </param>'.PHP_EOL
+            .'</params>'.PHP_EOL
+            .'</methodCall>';
 
         $headers = array(
             "Content-Type: text/xml",
