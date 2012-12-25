@@ -1,0 +1,10 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+
+before_script:
+  - pyrus channel-discover pear.symfony.com
+
+script: bash run-test.sh

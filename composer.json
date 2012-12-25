@@ -1,0 +1,17 @@
+{
+    "name": "frandieguez/pingback-php",
+    "type": "library",
+    "description": "Class for performing Pinback requests, Pingback 1.0 compliant",
+    "keywords": ["library"],
+    "homepage": "http://frandieguez.github.com/Pingback-PHP/",
+    "license": "MIT",
+    "authors": [
+        {"name": "Fran Diéguez", "email": "fran.dieguez@mabishu.com"}
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "autoload": {
+        "psr-0": { "Pingback": "src/" }
+    }
+}
