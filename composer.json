@@ -1,9 +1,9 @@
 {
     "name": "frandieguez/pingback-php",
     "type": "library",
-    "description": "Library for performing Pinback requests (Pingback 1.0 compliant)",
+    "description": "Library for performing Pingback requests (Pingback 1.0 compliant)",
     "keywords": ["library"],
-    "homepage": "http://frandieguez.github.com/Pingback-PHP/",
+    "homepage": "http://frandieguez.github.com/pingback-php/",
     "license": "MIT",
     "authors": [
         {"name": "Fran Diéguez", "email": "fran.dieguez@mabishu.com"}

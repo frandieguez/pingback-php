@@ -4,8 +4,10 @@ Pingback-PHP
 What  is this!
 --------------
 
-With this wrapper class you can manage any video service in a uniformed and
-unique way. You only need the URL from the video service you are going to use.
+Library for performing Pingback requests in a simple way (Pingback 1.0 compliant).
+
+Pingback-PHP is Pingback 1.0 standard specification compliant. Please refer to its
+[original webpage](http://www.hixie.ch/specs/pingback/pingback) to get deeper information about how it works.
 
 A quick example:
 
@@ -28,13 +30,8 @@ With Pingback-PHP you can make it like this:
           printf("Exception raised with code (%d) : %s\n", $e->getCode(), $e->getMessage());
         }
 
-Standard compliant
-------------------
-Pingback-PHP is Pingback 1.0 standard specification compliant. Please refer to its
-[original webpage](http://www.hixie.ch/specs/pingback/pingback) to get deeper information about how it works.
-
-Exceptions
-----------
+Exception-aware
+---------------
 Pingback-PHP raises different exceptions if some error happens in the target server
 or between client-server communication. So take care of this raised exceptions in your code.
 
