@@ -13,13 +13,15 @@ use Pingback\RequestHandler;
 use Pingback\Exception;
 
 /**
- * Implements the Pingback client to performing pingback requests
+ * Implements the Pingback client for performing pingback requests
+ *
+ * This library is Pingback 1.0 compliant: take a look at the specification at
+ * http://www.hixie.ch/specs/pingback/pingback
  *
  * @package Pingback
  **/
 class Client
 {
-
     /**
      * The User-agent sended to the server to identify this library
      *
@@ -34,6 +36,7 @@ class Client
      **/
     public function __construct(RequestHandlerInterface $requestHandler)
     {
+        // TODO: Avoid use of xmlrpc calls by using an external request handler
         $phpExtensions = get_loaded_extensions();
         $xmlrpcLoaded = in_array('xmlrpc', $phpExtensions);
 
@@ -60,7 +63,7 @@ class Client
      **/
     public function ping($sourceUrl, $targetUrl)
     {
-        $server = $this->discoverXmlRPCServer($sourceUrl);
+        $server = $this->discoverXmlRPCServer($targetUrl);
 
         $serverResponse = $this->performServerRequest(
             array(
@@ -81,7 +84,7 @@ class Client
     public function discoverXmlRPCServer($sourceUrl)
     {
         // TODO: Make use of an external request handler
-        $document = file_get_contents($sourceUrl);
+        list($headers, $document) = $this->getSourceUrlContent($sourceUrl);
 
         preg_match('@<link rel="pingback" href="([^>]*)" /?>@i', $document, $matches);
 
@@ -92,6 +95,26 @@ class Client
         }
 
         return $matches[1];
+    }
+
+    /**
+     * Performs the XMLRPC request given an array that must contain:
+     *  'source_url'    the original url that references the target url
+     *  'target_url'    the refered url
+     *  'xmlrpc_server' XMLRPC server urlt
+     *
+     * @param array $params required params to perform the request
+     * @return string the response
+     **/
+    public function performServerRequest($params)
+    {
+        $context = $this->prepareContext(
+            $params['source_url'],
+            $params['target_url']
+        );
+
+        // TODO: Make use of an external request handler
+        return file_get_contents($params['xmlrpc_server'], false, $context);
     }
 
     /**
@@ -139,26 +162,6 @@ class Client
     }
 
     /**
-     * Performs the XMLRPC request given an array that must contain:
-     *  'source_url'    the original url that references the target url
-     *  'target_url'    the refered url
-     *  'xmlrpc_server' XMLRPC server urlt
-     *
-     * @param array $params required params to perform the request
-     * @return string the response
-     **/
-    public function performServerRequest($params)
-    {
-        $context = $this->prepareContext(
-            $params['source_url'],
-            $params['target_url']
-        );
-
-        // TODO: Make use of an external request handler
-        return file_get_contents($params['xmlrpc_server'], false, $context);
-    }
-
-    /**
      * Handles the server response.
      * If something goes wrong raises and specialized exception
      *
@@ -173,8 +176,33 @@ class Client
         $response = xmlrpc_decode($serverResponse);
         if (is_array($response) && xmlrpc_is_fault($response)) {
             switch ($response['faultCode']) {
+                case 16:
+                    throw new Exception\SourceURINotValid(
+                        $response['faultString'],
+                        $response['faultCode']
+                    );
+                    break;
+                case 17:
+                    throw new Exception\TargetUriNotInSourceUri(
+                        $response['faultString'],
+                        $response['faultCode']
+                    );
+                    break;
+                case 32:
+                case 33:
+                    throw new Exception\TargetURINotValid(
+                        $response['faultString'],
+                        $response['faultCode']
+                    );
+                    break;
                 case 48:
                     throw new Exception\PingAlreadyRegistered(
+                        $response['faultString'],
+                        $response['faultCode']
+                    );
+                    break;
+                case 50:
+                    throw new Exception\ErrorFromUpstreamServer(
                         $response['faultString'],
                         $response['faultCode']
                     );
@@ -187,5 +215,18 @@ class Client
                     break;
             }
         }
+    }
+
+    /**
+     * Retrieves the sourceUrl HTTP headers and content
+     *
+     * @return array the http headers and html content
+     **/
+    public function getSourceUrlContent($sourceUrl)
+    {
+        $headers = array();
+        $content = file_get_contents($sourceUrl);
+
+        return array($headers, $content);
     }
 }
