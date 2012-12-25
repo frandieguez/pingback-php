@@ -18,4 +18,48 @@ use Pingback\RequestHandlerInterface;
  **/
 class RequestHandler implements RequestHandlerInterface
 {
+    /**
+     * {@inheritdoc}
+     **/
+    public function get($url, $headers = array())
+    {
+        $headers = implode('\r\n', $headers);
+        $context = stream_context_create(
+            array(
+                'http' =>
+                array(
+                    'method' => "GET",
+                    'header' => $headers,
+                )
+            )
+        );
+
+        $content = file_get_contents($url, false, $context);
+        $headers = $http_response_header;
+
+        return array($headers, $content);
+    }
+
+    /**
+     * {@inheritdoc}
+     **/
+    public function post($url, $content = '', $headers = array())
+    {
+        $headers = implode("\r\n", $headers);
+        // var_dump($headers, $content);die();
+        $context = stream_context_create(
+            array(
+                'http' =>
+                array(
+                    'method'  => "POST",
+                    'header'  => $headers,
+                    'content' => $content,
+                )
+            )
+        );
+        $content = file_get_contents($url, false, $context);
+        $headers = $http_response_header;
+
+        return array($headers, $content);
+    }
 }

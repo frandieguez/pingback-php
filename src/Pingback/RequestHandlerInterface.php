@@ -16,4 +16,24 @@ namespace Pingback;
  **/
 interface RequestHandlerInterface
 {
+    /**
+     * Performs a GET request returning the HTTP headers and contents
+     *
+     * @param string $url the url to get contents from
+     * @param array headers list of custom headers that must be sent in the request
+     *
+     * @return array the headers and contents for the request
+     **/
+    public function get($url, $headers = array());
+
+    /**
+     * Performs a POST request returning the HTTP headers, and contents
+     *
+     * @param string $url the url to get contents from
+     * @param string $content the content that must be sent as the request body
+     * @param array headers list of custom headers that must be sent in the request
+     *
+     * @return array the headers and contents for the request
+     **/
+    public function post($url, $content = '', $headers = array());
 }

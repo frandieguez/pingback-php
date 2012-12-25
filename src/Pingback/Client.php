@@ -30,6 +30,13 @@ class Client
     private $agentString = 'Pingback-PHP 0.9';
 
     /**
+     * The Request handler used to perform HTTP calls
+     *
+     * @var string
+     **/
+    private $handler;
+
+    /**
      * Initializes the pingback client
      *
      * @return void
@@ -65,7 +72,7 @@ class Client
     {
         $server = $this->discoverXmlRPCServer($targetUrl);
 
-        $serverResponse = $this->performServerRequest(
+        list($serverHeaders, $serverContent) = $this->performServerRequest(
             array(
                 'source_url'    => $sourceUrl,
                 'target_url'    => $targetUrl,
@@ -73,7 +80,7 @@ class Client
             )
         );
 
-        $this->handleResponse($serverResponse);
+        $this->handleResponse($serverContent);
     }
 
     /**
@@ -83,11 +90,19 @@ class Client
      **/
     public function discoverXmlRPCServer($sourceUrl)
     {
-        // TODO: Make use of an external request handler
-        list($headers, $document) = $this->getSourceUrlContent($sourceUrl);
+        list($headers, $document) = $this->handler->get($sourceUrl);
 
+        // Detect XML-RPC server from the document headers
+        foreach ($headers as $header) {
+            if (stripos($header, "X-Pingback:") !== false) {
+                $server = str_ireplace("X-Pingback: ", "", $header);
+
+                return $server;
+            }
+        }
+
+        // Detect server from the document content
         preg_match('@<link rel="pingback" href="([^>]*)" /?>@i', $document, $matches);
-
         if (!array_key_exists(1, $matches)) {
             throw new Exception\NotAvailableXmlRPCServer(
                 'Unable to find the target XMLRPC server'
@@ -108,13 +123,16 @@ class Client
      **/
     public function performServerRequest($params)
     {
-        $context = $this->prepareContext(
+        list($headers, $content) = $this->prepareRequestComponents(
             $params['source_url'],
             $params['target_url']
         );
 
-        // TODO: Make use of an external request handler
-        return file_get_contents($params['xmlrpc_server'], false, $context);
+        return $this->handler->post(
+            $params['xmlrpc_server'],
+            $content,
+            $headers
+        );
     }
 
     /**
@@ -122,12 +140,12 @@ class Client
      *
      * @return Context
      **/
-    private function prepareContext($sourceUrl, $targetUrl)
+    private function prepareRequestComponents($sourceUrl, $targetUrl)
     {
         $parse = parse_url($targetUrl);
         $targetBaseDomain = $parse['host'];
 
-        $request = '<?xml version="1.0" encoding="iso-8859-1"?>
+        $content = '<?xml version="1.0" encoding="iso-8859-1"?>
 <methodCall>
 <methodName>pingback.ping</methodName>
 <params>
@@ -144,21 +162,13 @@ class Client
 </params>
 </methodCall>';
 
-        $context = stream_context_create(
-            array(
-                'http' =>
-                array(
-                    'method' => "POST",
-                    'header' =>
-                        "Content-Type: text/xml\r\n"
-                        ."User-Agent: {$this->agentString}\r\n"
-                        ."Host: $targetBaseDomain\r\n",
-                    'content' => $request
-                )
-            )
+        $headers = array(
+            "Content-Type: text/xml",
+            "User-Agent: ".$this->agentString,
+            "Host: ".$targetBaseDomain,
         );
 
-        return $context;
+        return array($headers, $content);
     }
 
     /**
@@ -215,18 +225,5 @@ class Client
                     break;
             }
         }
-    }
-
-    /**
-     * Retrieves the sourceUrl HTTP headers and content
-     *
-     * @return array the http headers and html content
-     **/
-    public function getSourceUrlContent($sourceUrl)
-    {
-        $headers = array();
-        $content = file_get_contents($sourceUrl);
-
-        return array($headers, $content);
     }
 }
