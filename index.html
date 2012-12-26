@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Pingback-php by frandieguez</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Pingback-php</h1>
+        <p>Library for performing Pinback requests (Pingback 1.0 compliant)</p>
+
+        <p class="view"><a href="https://github.com/frandieguez/pingback-php">View the Project on GitHub <small>frandieguez/pingback-php</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/frandieguez/pingback-php/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/frandieguez/pingback-php/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/frandieguez/pingback-php">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Pingback-PHP</h1>
+
+<h2>What  is this!</h2>
+
+<p>Library for performing Pingback requests in a simple way (Pingback 1.0 compliant).</p>
+
+<p>Pingback-PHP is Pingback 1.0 standard specification compliant. Please refer to its
+<a href="http://www.hixie.ch/specs/pingback/pingback">original webpage</a> to get deeper information about how it works.</p>
+
+<p>A quick example:</p>
+
+<p>To inform to <a href="http://www.mabishu.com/blog/2012/12/14/object-calisthenics-write-better-object-oriented-code/">this article</a>
+that you have referenced it from <a href="http://www.mabishu.com/blog/2012/12/14/get-better-performance-and-life-from-your-ssd-in-linux-based-systems/">one of your posts</a>
+by using the Pingback protocol, you can make it like this:</p>
+
+<pre><code>// Prepare the Pingback client
+$requestHandler = new Pingback\RequestHandler();
+$client = new Pingback\Client($requestHandler);
+
+// Perform the pingback call
+try {
+
+    $client-&gt;ping(
+        "http://www.mabishu.com/blog/2012/12/14/get-better-performance-and-life-from-your-ssd-in-linux-based-systems/",
+        "http://www.mabishu.com/blog/2012/12/14/object-calisthenics-write-better-object-oriented-code/";
+    );
+
+} catch (Pingback\Exception $e) {
+  printf("Exception raised with code (%d) : %s\n", $e-&gt;getCode(), $e-&gt;getMessage());
+}
+</code></pre>
+
+<h2>Exception-aware</h2>
+
+<p>Pingback-PHP raises different exceptions if some error happens in the target server
+or between client-server communication.</p>
+
+<p>All the exceptions has a direct correlation with the server reported faults:</p>
+
+<ul>
+<li>0: A generic fault code.</li>
+<li>0×0010 (16): The source URI does not exist.</li>
+<li>0×0011 (17): The source URI does not contain a link to the target URI</li>
+<li>0×0020 (32): The specified target URI does not exist.</li>
+<li>0×0021 (33): The specified target URI cannot be used as a target.</li>
+<li>0×0030 (48): The pingback has already been registered.</li>
+<li>0×0031 (49): Access denied.</li>
+<li>0×0032 (50): The server could not communicate with an upstream server.</li>
+</ul><p>So take care of this raised exceptions in your code.</p>
+
+<h2>Install it!</h2>
+
+<ol>
+<li>Just put in one of your include_path folders, and make sure to use an
+PSR-0-compatible autoloader.</li>
+</ol><h2>Dependencies</h2>
+
+<p>This library only depends on PHP 5.3, you have to use namespaces and some other goodies of 5.3 version.</p>
+
+<p>Please <strong>don't ask for PHP &lt; 5.3 support</strong>, you shouldn't use PHP 5.2.</p>
+
+<h2>Test it!</h2>
+
+<p>Help us to mantain this library updated. Run our unit tests with phpunit to
+give us feedback about what doesn't work.</p>
+
+<p>For running tests:</p>
+
+<ol>
+<li>Install in your system PHPUnit: <a href="http://pear.phpunit.de/">http://pear.phpunit.de/</a>
+</li>
+<li>And simply run phpunit from the root of projct: phpunit</li>
+</ol><h2>Build Status</h2>
+
+<p><a href="http://travis-ci.org/frandieguez/pingback-php"><img src="https://secure.travis-ci.org/frandieguez/pingback-php.png"></a></p>
+
+<h2>And... what else?</h2>
+
+<p>If you find a bug or want to suggest a new video service, please let us know in <a href="http://github.com/frandieguez/pingback-php/issues">a ticket</a>.</p>
+
+<p>Thanks!!</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/frandieguez">frandieguez</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
