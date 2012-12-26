@@ -11,29 +11,43 @@ Pingback-PHP is Pingback 1.0 standard specification compliant. Please refer to i
 
 A quick example:
 
-To inform [this article](http://www.mabishu.com/blog/2012/12/14/object-calisthenics-write-better-object-oriented-code/) in that your site has referenced it from [your site post](http://www.mabishu.com/blog/2012/12/14/get-better-performance-and-life-from-your-ssd-in-linux-based-systems/).
-With Pingback-PHP you can make it like this:
+To inform to [this article](http://www.mabishu.com/blog/2012/12/14/object-calisthenics-write-better-object-oriented-code/)
+that you have referenced it from [one of your posts](http://www.mabishu.com/blog/2012/12/14/get-better-performance-and-life-from-your-ssd-in-linux-based-systems/)
+by using the Pingback protocol, you can make it like this:
 
-        // Prepare the Pingback client
-        $requestHandler = new Pingback\RequestHandler();
-        $client = new Pingback\Client($requestHandler);
+    // Prepare the Pingback client
+    $requestHandler = new Pingback\RequestHandler();
+    $client = new Pingback\Client($requestHandler);
 
-        // Perform the pingback call
-        try {
+    // Perform the pingback call
+    try {
 
-            $client->ping(
-                "http://www.mabishu.com/blog/2012/12/14/get-better-performance-and-life-from-your-ssd-in-linux-based-systems/",
-                "http://www.mabishu.com/blog/2012/12/14/object-calisthenics-write-better-object-oriented-code/";
-            );
+        $client->ping(
+            "http://www.mabishu.com/blog/2012/12/14/get-better-performance-and-life-from-your-ssd-in-linux-based-systems/",
+            "http://www.mabishu.com/blog/2012/12/14/object-calisthenics-write-better-object-oriented-code/";
+        );
 
-        } catch (Pingback\Exception $e) {
-          printf("Exception raised with code (%d) : %s\n", $e->getCode(), $e->getMessage());
-        }
+    } catch (Pingback\Exception $e) {
+      printf("Exception raised with code (%d) : %s\n", $e->getCode(), $e->getMessage());
+    }
 
 Exception-aware
 ---------------
 Pingback-PHP raises different exceptions if some error happens in the target server
-or between client-server communication. So take care of this raised exceptions in your code.
+or between client-server communication.
+
+All the exceptions has a direct correlation with the server reported faults:
+
+ - 0: A generic fault code.
+ - 0×0010 (16): The source URI does not exist.
+ - 0×0011 (17): The source URI does not contain a link to the target URI
+ - 0×0020 (32): The specified target URI does not exist.
+ - 0×0021 (33): The specified target URI cannot be used as a target.
+ - 0×0030 (48): The pingback has already been registered.
+ - 0×0031 (49): Access denied.
+ - 0×0032 (50): The server could not communicate with an upstream server.
+
+So take care of this raised exceptions in your code.
 
 
 Install it!
@@ -56,7 +70,7 @@ give us feedback about what doesn't work.
 
 For running tests:
 
-1. Install in your system PHPUnit: http://pear.php.net/package/PHPUnit/redirected
+1. Install in your system PHPUnit: http://pear.phpunit.de/
 4. And simply run phpunit from the root of projct: phpunit
 
 Build Status
