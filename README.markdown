@@ -1,8 +1,6 @@
-Pingback-PHP
-============
+# Pingback-PHP [![Build Status](https://secure.travis-ci.org/frandieguez/pingback-php.png)](http://travis-ci.org/frandieguez/pingback-php)
 
-What  is this!
---------------
+## What  is this!
 
 Library for performing Pingback requests in a simple way (Pingback 1.0 compliant).
 
@@ -31,8 +29,8 @@ by using the Pingback protocol, you can make it like this:
       printf("Exception raised with code (%d) : %s\n", $e->getCode(), $e->getMessage());
     }
 
-Exception-aware
----------------
+## Exception-aware
+
 Pingback-PHP raises different exceptions if some error happens in the target server
 or between client-server communication.
 
@@ -50,21 +48,18 @@ All the exceptions has a direct correlation with the server reported faults:
 So take care of this raised exceptions in your code.
 
 
-Install it!
------------
+## Install it!
 
 1. Just put in one of your include_path folders, and make sure to use an
 PSR-0-compatible autoloader.
 
-Dependencies
-------------
-This library only depends on PHP 5.3, you have to use namespaces and some other goodies of 5.3 version.
+## Dependencies
 
-Please __don't ask for PHP < 5.3 support__, you shouldn't use PHP 5.2.
+This library is only compatible with PHP 5.3 or later.
 
+- For now the unique dependency is the xmlrpc php extension for encoding/decing the protocol messages. We are looking to replace this with a simple library.
 
-Test it!
---------
+## Test it!
 Help us to mantain this library updated. Run our unit tests with phpunit to
 give us feedback about what doesn't work.
 
@@ -73,12 +68,8 @@ For running tests:
 1. Install in your system PHPUnit: http://pear.phpunit.de/
 4. And simply run phpunit from the root of projct: phpunit
 
-Build Status
-------------
-[<img src="https://secure.travis-ci.org/frandieguez/pingback-php.png"/>](http://travis-ci.org/frandieguez/pingback-php)
+## And... what else?
 
-And... what else?
------------------
 If you find a bug or want to suggest a new video service, please let us know in [a ticket](http://github.com/frandieguez/pingback-php/issues).
 
 Thanks!!
