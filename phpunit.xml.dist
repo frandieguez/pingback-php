@@ -24,11 +24,8 @@
     </testsuites>
 
     <filter>
-        <whitelist>
-            <exclude>
-                <directory suffix=".php">./examples/</directory>
-                <directory>./src/Pingback/Tests/</directory>
-            </exclude>
-        </whitelist>
+        <blacklist>
+          <directory suffix=".php">./examples</directory>
+        </blacklist>
     </filter>
 </phpunit>
