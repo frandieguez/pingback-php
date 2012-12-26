@@ -27,10 +27,10 @@ class RequestHandler implements RequestHandlerInterface
         $context = stream_context_create(
             array(
                 'http' =>
-                array(
-                    'method' => "GET",
-                    'header' => $headers,
-                )
+                    array(
+                        'method' => "GET",
+                        'header' => $headers,
+                    )
             )
         );
 
@@ -50,11 +50,11 @@ class RequestHandler implements RequestHandlerInterface
         $context = stream_context_create(
             array(
                 'http' =>
-                array(
-                    'method'  => "POST",
-                    'header'  => $headers,
-                    'content' => $content,
-                )
+                    array(
+                        'method'  => "POST",
+                        'header'  => $headers,
+                        'content' => $content,
+                    )
             )
         );
         $content = file_get_contents($url, false, $context);

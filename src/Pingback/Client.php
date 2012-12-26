@@ -86,14 +86,16 @@ class Client
     /**
      * Discovers the XmlRPC server url given a sourceURL
      *
+     * @param string $sourceUrl the source url where discover the XML-RPC server from
+     *
      * @return string the XmlRPC server url
      **/
     public function discoverXmlRPCServer($sourceUrl)
     {
         $response = $this->handler->get($sourceUrl);
 
-        $headers = $response['headers'];
-        $content = $response['content'];
+        $headers = $response[0];
+        $content = $response[1];
 
         // Detect XML-RPC server from the document headers
         foreach ($headers as $header) {
@@ -141,6 +143,9 @@ class Client
     /**
      * Prepares the XMLRPC request given two urls
      *
+     * @param string $sourceUrl the url that references the target Url
+     * @param string $targetUrl the referenced url
+     *
      * @return Context
      **/
     public function prepareRequestComponents($sourceUrl, $targetUrl)
@@ -187,6 +192,7 @@ class Client
     {
         // TODO: Avoid usage of php-xmlrpc extensions functions
         $response = xmlrpc_decode($serverResponse);
+
         if (is_array($response) && xmlrpc_is_fault($response)) {
             switch ($response['faultCode']) {
                 case 16:
